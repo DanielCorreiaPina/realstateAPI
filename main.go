@@ -1,5 +1,7 @@
 package main
 
+import "github.com/DanielCorreiaPina/realstateAPI/app"
+
 func main() {
-	Start()
+	app.Start()
 }
