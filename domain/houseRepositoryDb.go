@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/DanielCorreiaPina/realstateAPI/errs"
 	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/lib/pq"
 )
@@ -36,6 +37,23 @@ func (d HouseRepositoryDb) FindAll() ([]House, error) {
 		houses = append(houses, h)
 	}
 	return houses, nil
+}
+
+func (d HouseRepositoryDb) FindById(id string) (*House, *errs.AppError) {
+	houseSql := "select * from house where id = $1"
+
+	row := d.client.QueryRow(houseSql, id)
+	var h House
+	err := row.Scan(&h.Id, &h.ConstructionType, &h.NumberBedrooms, &h.NumberBathrooms, &h.Area, &h.ConstructionYear, &h.Condition, &h.EnergeticCertificate, &h.GarageSpots, &h.ParkingLots, &h.SwimmingPools, &h.Elevators, &h.FullyEquipped, &h.Address)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errs.NewNotFoundError("House not found")
+		} else {
+			log.Println("Error while scanning house " + err.Error())
+			return nil, errs.NewUnexpectedError("Unexpected database error")
+		}
+	}
+	return &h, nil
 }
 
 func NewHouseRepositoryDb() HouseRepositoryDb {

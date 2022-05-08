@@ -1,5 +1,7 @@
 package domain
 
+import "github.com/DanielCorreiaPina/realstateAPI/errs"
+
 type House struct {
 	Id                   int    `json:"id"`
 	ConstructionType     string `json:"construction_type"`
@@ -19,4 +21,5 @@ type House struct {
 
 type HouseRepository interface {
 	FindAll() ([]House, error)
+	FindById(string) (*House, *errs.AppError)
 }

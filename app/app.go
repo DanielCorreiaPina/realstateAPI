@@ -19,6 +19,7 @@ func Start() {
 
 	//define routes
 	router.HandleFunc("/houses", hh.getAllHouses).Methods(http.MethodGet)
+	router.HandleFunc("/houses/{house_id:[0-9]+}", hh.getHouse).Methods(http.MethodGet)
 
 	//starting server
 	log.Fatal(http.ListenAndServe("localhost:8000", router))
