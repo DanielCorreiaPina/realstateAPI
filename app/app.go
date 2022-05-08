@@ -14,7 +14,8 @@ func Start() {
 	router := mux.NewRouter()
 
 	//wiring
-	hh := HouseHandlers{service.NewHouseService(domain.NewHouseRepositoryStub())}
+	//hh := HouseHandlers{service.NewHouseService(domain.NewHouseRepositoryStub())}
+	hh := HouseHandlers{service.NewHouseService(domain.NewHouseRepositoryDb())}
 
 	//define routes
 	router.HandleFunc("/houses", hh.getAllHouses).Methods(http.MethodGet)
