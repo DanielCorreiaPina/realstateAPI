@@ -6,7 +6,7 @@ import (
 )
 
 type HouseService interface {
-	GetAllHouse() ([]domain.House, error)
+	GetAllHouse() ([]domain.House, *errs.AppError)
 	GetHouse(string) (*domain.House, *errs.AppError)
 }
 
@@ -14,7 +14,7 @@ type DefaultHouseService struct {
 	repo domain.HouseRepository
 }
 
-func (s DefaultHouseService) GetAllHouse() ([]domain.House, error) {
+func (s DefaultHouseService) GetAllHouse() ([]domain.House, *errs.AppError) {
 	return s.repo.FindAll()
 }
 

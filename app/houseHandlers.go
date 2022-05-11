@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/DanielCorreiaPina/realstateAPI/service"
@@ -14,9 +13,12 @@ type HouseHandlers struct {
 }
 
 func (hh *HouseHandlers) getAllHouses(w http.ResponseWriter, r *http.Request) {
-	houses, _ := hh.service.GetAllHouse()
-	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(houses)
+	houses, err := hh.service.GetAllHouse()
+	if err != nil {
+		writeResponse(w, err.Code, err.AsMessage())
+	} else {
+		writeResponse(w, http.StatusOK, houses)
+	}
 }
 
 func (hh *HouseHandlers) getHouse(w http.ResponseWriter, r *http.Request) {
@@ -25,10 +27,16 @@ func (hh *HouseHandlers) getHouse(w http.ResponseWriter, r *http.Request) {
 
 	house, err := hh.service.GetHouse(id)
 	if err != nil {
-		w.WriteHeader(err.Code)
-		fmt.Fprint(w, err.Message)
+		writeResponse(w, err.Code, err.AsMessage())
 	} else {
-		w.Header().Add("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(house)
+		writeResponse(w, http.StatusOK, house)
+	}
+}
+
+func writeResponse(w http.ResponseWriter, code int, data interface{}) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(code)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		panic(err)
 	}
 }

@@ -20,6 +20,6 @@ type House struct {
 }
 
 type HouseRepository interface {
-	FindAll() ([]House, error)
+	FindAll() ([]House, *errs.AppError)
 	FindById(string) (*House, *errs.AppError)
 }

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/DanielCorreiaPina/realstateAPI/errs"
+	"github.com/DanielCorreiaPina/realstateAPI/logger"
 	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/lib/pq"
 )
@@ -17,25 +18,28 @@ type HouseRepositoryDb struct {
 	client *sql.DB
 }
 
-func (d HouseRepositoryDb) FindAll() ([]House, error) {
-	findAllSql := "select * from house"
+func (d HouseRepositoryDb) FindAll() ([]House, *errs.AppError) {
+	var err error
+	var rows *sql.Rows
+	houses := make([]House, 0)
 
-	rows, err := d.client.Query(findAllSql)
+	findAllSql := "select * from house"
+	rows, err = d.client.Query(findAllSql)
 	if err != nil {
-		log.Println("Error while querying house table " + err.Error())
-		return nil, err
+		logger.Error("Error while querying house table " + err.Error())
+		return nil, errs.NewUnexpectedError("Unexpected database error")
 	}
 
-	houses := make([]House, 0)
 	for rows.Next() {
 		var h House
 		err := rows.Scan(&h.Id, &h.ConstructionType, &h.NumberBedrooms, &h.NumberBathrooms, &h.Area, &h.ConstructionYear, &h.Condition, &h.EnergeticCertificate, &h.GarageSpots, &h.ParkingLots, &h.SwimmingPools, &h.Elevators, &h.FullyEquipped, &h.Address)
 		if err != nil {
-			log.Println("Error while scanning houses " + err.Error())
-			return nil, err
+			logger.Error("Error while scanning houses " + err.Error())
+			return nil, errs.NewUnexpectedError("Unexpected database error")
 		}
 		houses = append(houses, h)
 	}
+
 	return houses, nil
 }
 
@@ -49,7 +53,7 @@ func (d HouseRepositoryDb) FindById(id string) (*House, *errs.AppError) {
 		if err == sql.ErrNoRows {
 			return nil, errs.NewNotFoundError("House not found")
 		} else {
-			log.Println("Error while scanning house " + err.Error())
+			logger.Error("Error while scanning house " + err.Error())
 			return nil, errs.NewUnexpectedError("Unexpected database error")
 		}
 	}
